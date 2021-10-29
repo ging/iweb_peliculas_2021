@@ -14,9 +14,9 @@ export default function Movies(props) {
 				miniatura={pelicula.miniatura} />)}
 		<div className="actions">
             <button className="new" onClick={props.newMovie}>Añadir</button>
-            <button className="down" onClick={props.download}>Download</button>
-            <button className="up" onClick={props.upload}>Upload</button>
-            <button className="reset" onClick={props.reset}>Reset</button>
+            <button className="down" onClick={props.download}>Descargar</button>
+            <button className="up" onClick={props.upload}>Subir</button>
+            <button className="reset" onClick={props.reset}>Reiniciar</button>
     </div>
 		<div>
 			<ul>INFO:
