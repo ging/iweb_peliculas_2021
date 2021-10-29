@@ -5,7 +5,7 @@ export default class MovieForm extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {...this.props.pelicula}
+		this.state = {...this.props.themovie}
 	}
 	render(){
 		return <div id="main">

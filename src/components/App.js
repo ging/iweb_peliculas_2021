@@ -3,7 +3,7 @@ import Navbar from "./Navbar";
 import Movies from "./Movies";
 import MovieInfo from "./MovieInfo";
 import MovieForm from "./MovieForm";
-import { misPeliculasIniciales } from "../constants/constants";
+import { myInitialMovies } from "../constants/constants";
 import {postAPI, getAPI, updateAPI} from "../api";
 
 export default class App extends React.Component {
@@ -11,30 +11,38 @@ export default class App extends React.Component {
 		super(props);
 		this.state = {
 			loading: true,
-			peliculas: [],
+			mymovies: [],
       current: null,
-      view: "MAIN"
+      view: "MAIN",
+			downloaded: null,
+			uploaded: null
 		};
 	}
 
 
 	render(){
-		const {current, peliculas, view} = this.state;
-		const peliculaSeleccionada = (typeof current === "number") && current >= 0;
-
+		const {current, mymovies, view, downloaded, uploaded} = this.state;
+		let vista = null;
+    switch(view) {
+      case "MAIN":
+        vista = <Movies themovies={mymovies} show={this.show} edit={this.edit} newMovie={this.newm} delete={this.erase} download={this.download} upload={this.upload} reset={this.reset} downloaded={downloaded} uploaded={uploaded}/>;
+        break;
+      case "SHOW":
+        vista = <MovieInfo themovie={mymovies[current]} main={this.main}/> ;
+        break;
+			case "EDIT":
+				vista = <MovieForm themovie={mymovies[current]} main={this.main} update={this.update}/>;
+				break;
+			case "NEW":
+				vista = <MovieForm themovie={{}} main={this.main} create={this.create} new/>;
+				break;
+      default:
+        vista = <Movies themovies={mymovies} show={this.show} edit={this.edit} newMovie={this.newm} delete={this.erase} download={this.download} upload={this.upload} reset={this.reset}/>;
+    }
 	  	return (
 	    <div className="root">
 	      <Navbar/>
-	      {this.state.loading ? <img src={process.env.PUBLIC_URL + "/spinner.gif"} className="spinner" alt="spinner" />: <div>
-		      {(!peliculaSeleccionada && view === "MAIN") ?  
-		      	<Movies peliculas={peliculas} show={this.show} edit={this.edit} newMovie={this.newm} delete={this.erase} download={this.download} upload={this.upload} reset={this.reset}/> : null}
-		      {( peliculaSeleccionada && view === "SHOW") ? 
-		      	<MovieInfo pelicula={peliculas[current]} main={this.main}/> : null}
-		   	  {( peliculaSeleccionada && view === "EDIT") ? 
-		   	  	<MovieForm pelicula={peliculas[current]} main={this.main} update={this.update}/> : null}
-		   	  {(!peliculaSeleccionada && view === "NEW")  ? 
-		   	  	<MovieForm pelicula={{}} main={this.main} create={this.create} new/> : null}
-		   	 </div>}
+				{this.state.loading ? <img src={process.env.PUBLIC_URL + "/spinner.gif"} className="spinner" alt="spinner" />: vista }
 	    </div>
 	  );
 	}
@@ -52,11 +60,11 @@ export default class App extends React.Component {
 	}
 
 	update = (updatedmovie) => {
-		this.setState({view: "MAIN", current: null, peliculas: this.state.peliculas.map((movie, index) => this.state.current === index ? updatedmovie : movie)});
+		this.setState({view: "MAIN", current: null, mymovies: this.state.mymovies.map((movie, index) => this.state.current === index ? updatedmovie : movie)});
 	}
 
 	erase = (indextoerase) => {
-		this.setState({view: "MAIN", current: null, peliculas: this.state.peliculas.filter((movie, index) => index !== indextoerase)});
+		this.setState({view: "MAIN", current: null, mymovies: this.state.mymovies.filter((movie, index) => index !== indextoerase)});
 	}	
 
 	newm = (movie) => {
@@ -64,27 +72,28 @@ export default class App extends React.Component {
 	}	
 
 	create = (movie)  => {
-		this.setState({view: "MAIN", current: null, peliculas: [...this.state.peliculas, movie]});
+		this.setState({view: "MAIN", current: null, mymovies: [...this.state.mymovies, movie]});
 	}
 
 	download = async () => {
-		let peliculas = await getAPI();
-		this.setState({peliculas: peliculas});
+		let downloadedMovies = await getAPI();
+		this.setState({mymovies: downloadedMovies, downloaded: new Date()});
 	}
 
 	upload = async () => {
-		await updateAPI(this.state.peliculas);
+		await updateAPI(this.state.mymovies);
+		this.setState({uploaded: new Date()});
 	}
 
 	reset = () => {
-		this.setState({view: "MAIN", current: null, peliculas: misPeliculasIniciales});
+		this.setState({view: "MAIN", current: null, mymovies: myInitialMovies, downloaded: null, uploaded: null});
 	}
 
 	async componentDidMount(){
 		try {
 			if (!localStorage.URL || localStorage.URL === "undefined") {
-			  localStorage.URL = await postAPI(misPeliculasIniciales);
-				this.setState({peliculas: misPeliculasIniciales});
+			  localStorage.URL = await postAPI(myInitialMovies);
+				this.setState({mymovies: myInitialMovies});
 			} else {
 				await this.download();
 			}
