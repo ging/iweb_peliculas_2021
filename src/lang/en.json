@@ -1,5 +1,12 @@
 {
   "favmovies": "My Favorite Movies",
   "en": "English",
-  "es": "Spanish"
+  "es": "Spanish",
+  "add": "Add",
+  "download": "Download",
+  "reset": "Reset",
+  "delete": "Delete",
+  "edit": "Edit",
+  "upload": "Upload",
+  "view": "View"
 }

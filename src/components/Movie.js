@@ -1,4 +1,5 @@
 import React from 'react';
+import { LangContext } from "./App";
 
 export default class Movie extends React.Component {
 	render(){
@@ -9,11 +10,16 @@ export default class Movie extends React.Component {
 			<div className="title">
 			 	{this.props.titulo || <em>Sin título</em>}
 			</div>
-			<div className="actions">
-				<button className="show" onClick={this.props.show}>ver</button>
-				<button className="edit" onClick={this.props.edit}>editar</button>
-				<button className="delete" onClick={this.props.delete}>borrar</button>
-			</div>
+			<LangContext.Consumer>
+				{(context) => {
+					return <div className="actions">
+									<button className="show" onClick={this.props.show}>{context.dictionary["view"]}</button>
+									<button className="edit" onClick={this.props.edit}>{context.dictionary["edit"]}</button>
+									<button className="delete" onClick={this.props.delete}>{context.dictionary["delete"]}</button>
+								</div>
+					}
+				}		
+			</LangContext.Consumer>			
 		</div>
 
 	}

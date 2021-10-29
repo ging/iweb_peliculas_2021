@@ -1,5 +1,12 @@
 {
   "favmovies": "Mis Películas Favoritas",
   "en": "Inglés",
-  "es": "Español"
+  "es": "Español",
+  "add": "Añadir",
+  "download": "Descargar",
+  "reset": "Reiniciar",
+  "delete": "Borrar",
+  "edit": "Editar",
+  "upload": "Subir",
+  "view": "Ver"
 }
