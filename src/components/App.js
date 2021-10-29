@@ -6,6 +6,13 @@ import MovieForm from "./MovieForm";
 import { myInitialMovies } from "../constants/constants";
 import {postAPI, getAPI, updateAPI} from "../api";
 
+import es from '../lang/es.json';
+import en from '../lang/en.json';
+
+const dictionaryList = { en, es };
+
+export const LangContext = React.createContext({userLang: 'es', dictionary: es});
+
 export default class App extends React.Component {
 	constructor(props) {
 		super(props);
@@ -15,7 +22,8 @@ export default class App extends React.Component {
       current: null,
       view: "MAIN",
 			downloaded: null,
-			uploaded: null
+			uploaded: null,
+			lang: 'en'
 		};
 	}
 
@@ -41,10 +49,16 @@ export default class App extends React.Component {
     }
 	  	return (
 	    <div className="root">
-	      <Navbar/>
-				{this.state.loading ? <img src={process.env.PUBLIC_URL + "/spinner.gif"} className="spinner" alt="spinner" />: vista }
+				<LangContext.Provider value={{handleLanguageChange: this.handleLanguageChange, userLang: this.state.lang, dictionary: dictionaryList[this.state.lang]}}>
+	      	<Navbar/>
+					{this.state.loading ? <img src={process.env.PUBLIC_URL + "/spinner.gif"} className="spinner" alt="spinner" />: vista }
+				</LangContext.Provider>
 	    </div>
 	  );
+	}
+
+	handleLanguageChange = (event) => {
+		this.setState({lang: event.target.value});
 	}
 
 	show = (index) => {

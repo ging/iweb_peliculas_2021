@@ -1,4 +1,15 @@
+import { LangContext } from "./App";
+import LangSelector from "./LangSelector";
+
 export default function Navbar(props) {
 	
-	return <h1>Mis Películas Favoritas</h1>
+	return <LangContext.Consumer>
+  	{(context) => {
+			return <div>
+					<h1>{context.dictionary["favmovies"]}</h1>
+					<LangSelector />
+				</div>
+			}
+		}		
+	</LangContext.Consumer>
 }
