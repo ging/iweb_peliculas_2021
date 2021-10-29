@@ -1,11 +1,12 @@
 import React from 'react';
+import {Link} from "react-router-dom";
+import { withRouter } from "react-router";
 
-export default class MovieForm extends React.Component {
+class MovieForm extends React.Component {
 
 	constructor(props) {
 		super(props);
-
-		this.state = {...this.props.themovie}
+		this.state = {...this.props.themovies[props.match.params.movieId]}
 	}
 	render(){
 		return <div id="main">
@@ -30,11 +31,11 @@ export default class MovieForm extends React.Component {
 					<button className="update" onClick={()=>this.props.update(this.state)}>
 						Actualizar
 					</button>}
-					<button className="index" onClick={this.props.main}>
-						Volver
-					</button>
+					<Link to="/"><button className="index">Volver</button></Link>
 				</div>
 			</div>
 
 	}
 }
+
+export default withRouter(MovieForm);

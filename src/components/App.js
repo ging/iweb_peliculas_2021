@@ -6,14 +6,14 @@ import MovieForm from "./MovieForm";
 import { myInitialMovies } from "../constants/constants";
 import {postAPI, getAPI, updateAPI} from "../api";
 
+import { BrowserRouter as Router, Switch, Route, Link} from "react-router-dom";
+
 export default class App extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			loading: true,
 			mymovies: [],
-      current: null,
-      view: "MAIN",
 			downloaded: null,
 			uploaded: null
 		};
@@ -21,42 +21,29 @@ export default class App extends React.Component {
 
 
 	render(){
-		const {current, mymovies, view, downloaded, uploaded} = this.state;
-		let vista = null;
-    switch(view) {
-      case "MAIN":
-        vista = <Movies themovies={mymovies} show={this.show} edit={this.edit} newMovie={this.newm} delete={this.erase} download={this.download} upload={this.upload} reset={this.reset} downloaded={downloaded} uploaded={uploaded}/>;
-        break;
-      case "SHOW":
-        vista = <MovieInfo themovie={mymovies[current]} main={this.main}/> ;
-        break;
-			case "EDIT":
-				vista = <MovieForm themovie={mymovies[current]} main={this.main} update={this.update}/>;
-				break;
-			case "NEW":
-				vista = <MovieForm themovie={{}} main={this.main} create={this.create} new/>;
-				break;
-      default:
-        vista = <Movies themovies={mymovies} show={this.show} edit={this.edit} newMovie={this.newm} delete={this.erase} download={this.download} upload={this.upload} reset={this.reset}/>;
-    }
+		const {mymovies, downloaded, uploaded} = this.state;
+		
 	  	return (
 	    <div className="root">
 	      <Navbar/>
-				{this.state.loading ? <img src={process.env.PUBLIC_URL + "/spinner.gif"} className="spinner" alt="spinner" />: vista }
+				{this.state.loading ? <img src={process.env.PUBLIC_URL + "/spinner.gif"} className="spinner" alt="spinner" />: <Router>
+					<Switch>
+						<Route path="/add">
+							<MovieForm themovie={{}} main={this.main} create={this.create} new/>
+						</Route>
+						<Route path="/edit/:movieId">
+							<MovieForm themovies={mymovies} main={this.main} update={this.update}/>
+						</Route>
+						<Route path="/show/:movieId">
+							<MovieInfo themovies={mymovies} main={this.main}/>
+						</Route>
+						<Route path="/">
+						<Movies themovies={mymovies} show={this.show} edit={this.edit} newMovie={this.newm} delete={this.erase} download={this.download} upload={this.upload} reset={this.reset} downloaded={downloaded} uploaded={uploaded}/>
+						</Route>
+        	</Switch>
+					</Router>}
 	    </div>
 	  );
-	}
-
-	show = (index) => {
-		this.setState({view: "SHOW", current: index});
-	}
-
-	main = () => {
-		this.setState({view: "MAIN", current: null});
-	}
-
-	edit = (index) => {
-		this.setState({view: "EDIT", current: index});
 	}
 
 	update = (updatedmovie) => {
@@ -65,10 +52,6 @@ export default class App extends React.Component {
 
 	erase = (indextoerase) => {
 		this.setState({view: "MAIN", current: null, mymovies: this.state.mymovies.filter((movie, index) => index !== indextoerase)});
-	}	
-
-	newm = (movie) => {
-		this.setState({view: "NEW", current: null});
 	}	
 
 	create = (movie)  => {
@@ -104,7 +87,6 @@ export default class App extends React.Component {
 		} catch(e) {
 			alert("ERROR");
 		}
-
 	}
 
 }

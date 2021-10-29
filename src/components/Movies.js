@@ -1,4 +1,5 @@
 import Movie from './Movie';
+import {Link} from "react-router-dom";
 
 
 export default function Movies(props) {
@@ -9,11 +10,12 @@ export default function Movies(props) {
 				edit={()=>props.edit(index)}
 				show={()=>props.show(index)}
 				delete={()=>props.delete(index)}
+				id={pelicula.id}
 				titulo={pelicula.titulo} 
 				director={pelicula.director} 
 				miniatura={pelicula.miniatura} />)}
 		<div className="actions">
-            <button className="new" onClick={props.newMovie}>Añadir</button>
+						<Link to="/add"><button className="new">Añadir</button></Link>
             <button className="down" onClick={props.download}>Descargar</button>
             <button className="up" onClick={props.upload}>Subir</button>
             <button className="reset" onClick={props.reset}>Reiniciar</button>
