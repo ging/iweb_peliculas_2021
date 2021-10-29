@@ -5,7 +5,7 @@ export default function Navbar(props) {
 	
 	return <LangContext.Consumer>
   	{(context) => {
-			return <div>
+			return <div className="header">
 					<h1>{context.dictionary["favmovies"]}</h1>
 					<LangSelector />
 				</div>
