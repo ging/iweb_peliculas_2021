@@ -1,4 +1,4 @@
 export default function Navbar(props) {
 	
-	return <h1>Mis Películas Favoritas</h1>
+	return <div className="header"><h1>Mis Películas Favoritas</h1></div>
 }
