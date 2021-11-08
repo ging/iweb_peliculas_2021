@@ -6,7 +6,7 @@ class MovieForm extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.state = {...this.props.themovies[props.match.params.movieId]}
+		this.state = this.props.new ? {titulo: "", director: "", miniatura: ""}:{...this.props.themovies.find(({id})=>{ return id===Number(props.match.params.movieId)})};
 	}
 	render(){
 		return <div id="main">
