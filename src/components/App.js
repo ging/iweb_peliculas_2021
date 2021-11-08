@@ -9,6 +9,12 @@ import {postAPI, getAPI, updateAPI} from "../api";
 import { Switch, Route} from "react-router-dom";
 import { withRouter } from "react-router";
 
+import es from '../lang/es.json';
+import en from '../lang/en.json';
+
+const dictionaryList = { en, es };
+
+export const LangContext = React.createContext({userLang: 'es', dictionary: es});
 
 class App extends React.Component {
 	constructor(props) {
@@ -18,7 +24,8 @@ class App extends React.Component {
 			mymovies: [],
 			nextid: 3,
 			downloaded: null,
-			uploaded: null
+			uploaded: null,
+			lang: 'en'
 		};
 	}
 
@@ -28,23 +35,29 @@ class App extends React.Component {
 		
 	  	return (
 					<div className="root">
-						<Navbar/>
-						{this.state.loading ? <img src={process.env.PUBLIC_URL + "/spinner.gif"} className="spinner" alt="spinner" />: <Switch>
-								<Route path="/add">
-									<MovieForm themovie={{}} create={this.create} new/>
-								</Route>
-								<Route path="/edit/:movieId">
-									<MovieForm themovies={mymovies} update={this.update}/>
-								</Route>
-								<Route path="/show/:movieId">
-									<MovieInfo themovies={mymovies} />
-								</Route>
-								<Route path="/">
-								<Movies themovies={mymovies} delete={this.erase} download={this.download} upload={this.upload} reset={this.reset} downloaded={downloaded} uploaded={uploaded}/>
-								</Route>
-							</Switch>}
+						<LangContext.Provider value={{handleLanguageChange: this.handleLanguageChange, userLang: this.state.lang, dictionary: dictionaryList[this.state.lang]}}>
+							<Navbar/>
+							{this.state.loading ? <img src={process.env.PUBLIC_URL + "/spinner.gif"} className="spinner" alt="spinner" />: <Switch>
+									<Route path="/add">
+										<MovieForm themovie={{}} create={this.create} new/>
+									</Route>
+									<Route path="/edit/:movieId">
+										<MovieForm themovies={mymovies} update={this.update}/>
+									</Route>
+									<Route path="/show/:movieId">
+										<MovieInfo themovies={mymovies} />
+									</Route>
+									<Route path="/">
+									<Movies themovies={mymovies} delete={this.erase} download={this.download} upload={this.upload} reset={this.reset} downloaded={downloaded} uploaded={uploaded}/>
+									</Route>
+								</Switch>}
+							</LangContext.Provider>
 					</div>
 	  );
+	}
+
+	handleLanguageChange = (event) => {
+		this.setState({lang: event.target.value});
 	}
 
 	update = (updatedmovie) => {
