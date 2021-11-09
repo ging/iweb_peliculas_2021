@@ -1,41 +1,36 @@
-import React from 'react';
 import {Link} from "react-router-dom";
-import { withRouter } from "react-router";
+import { useParams } from "react-router";
+import { useState } from "react";
 
-class MovieForm extends React.Component {
+export default function MovieForm(props) {
+	const params = useParams();
 
-	constructor(props) {
-		super(props);
-		this.state = this.props.new ? {titulo: "", director: "", miniatura: ""}:{...this.props.themovies.find(({id})=>{ return id===Number(props.match.params.movieId)})};
-	}
-	render(){
+	let defaultstate = props.new ? {titulo: "", director: "", miniatura: ""}:{...props.themovies.find(({id})=>{ return id===Number(params.movieId)})};
+	const [movie, setMovie] = useState(defaultstate);
+	
 		return <div id="main">
  				<h2>Editar Película </h2>
 				<div className="field">
 					Título <br/>
-					<input  type="text" id="titulo" placeholder="Título" value={this.state.titulo} onChange={e=>this.setState({titulo: e.target.value})}></input>
+					<input  type="text" id="titulo" placeholder="Título" value={movie.titulo} onChange={e=>setMovie({...movie, titulo: e.target.value})}></input>
 				</div>
 				<div className="field">
 					Director <br/>
-					<input  type="text" id="director" placeholder="Director" value={this.state.director} onChange={e=>this.setState({director: e.target.value})}></input>
+					<input  type="text" id="director" placeholder="Director" value={movie.director} onChange={e=>setMovie({...movie, director: e.target.value})}></input>
 				</div>
 				<div className="field">
 					Miniatura <br/>
-					<input  type="text" id="miniatura" placeholder="URL de la miniatura" value={this.state.miniatura} onChange={e=>this.setState({miniatura: e.target.value})}></input>
+					<input  type="text" id="miniatura" placeholder="URL de la miniatura" value={movie.miniatura} onChange={e=>setMovie({...movie, miniatura: e.target.value})}></input>
 				</div>
 				<div className="actions">
-					{this.props.new ?
-						<button className="new" onClick={()=>this.props.create(this.state)}>
+					{props.new ?
+						<button className="new" onClick={()=>props.create(movie)}>
 						Crear
 					</button> :
-					<button className="update" onClick={()=>this.props.update(this.state)}>
+					<button className="update" onClick={()=>props.update(movie)}>
 						Actualizar
 					</button>}
 					<Link to="/"><button className="index">Volver</button></Link>
 				</div>
 			</div>
-
-	}
 }
-
-export default withRouter(MovieForm);
