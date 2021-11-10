@@ -12,26 +12,30 @@ import {useNavigate} from "react-router-dom";
 
 export default function App() {
 	const [loading, setLoading] = useState(true);
-	const [mymovies, setMymovies] = useState([]);
+	const [mymovies, setMymovies] = useState({});
 	const [nextid, setNextid] = useState(3);
 	const [downloaded, setDownloaded] = useState(null);
 	const [uploaded, setUploaded] = useState(null);
 
 	const navigate = useNavigate();
 
-	const update = (updatedmovie) => {
-		setMymovies(mymovies.map((movie, index) => updatedmovie.id === movie.id ? updatedmovie : movie));
+	const update = (id, updatedmovie) => {
+		let newmovies = Object.assign({}, mymovies);
+		newmovies[id] = updatedmovie;
+		setMymovies(newmovies);
 		navigate('/');
 	}
 
 	const erase = (idtoerase) => {
-		setMymovies(mymovies.filter((movie) => movie.id !== idtoerase));
+		let newmovies = Object.assign({}, mymovies);
+		delete newmovies[idtoerase];
+		setMymovies(newmovies);
 		navigate('/');
 	}	
 
 	const create = (movie)  => {
 		movie.id = nextid;
-		setMymovies([...mymovies, movie]);
+		setMymovies({...mymovies, [nextid]: movie});
 		setNextid(nextid + 1);
 		navigate('/');
 	}

@@ -4,16 +4,17 @@ import {Link} from "react-router-dom";
 
 export default function Movies(props) {
 	return <div id="main">
-		{props.themovies.map((pelicula,index)=>
-			<Movie 
+		{Object.keys(props.themovies).map(function(key, index) {
+			let pelicula = props.themovies[key];
+			return <Movie 
 			  key={index}
-				edit={()=>props.edit(pelicula.id)}
-				show={()=>props.show(pelicula.id)}
-				delete={()=>props.delete(pelicula.id)}
-				id={pelicula.id}
+				edit={()=>props.edit(key)}
+				show={()=>props.show(key)}
+				delete={()=>props.delete(key)}
+				id={key}
 				titulo={pelicula.titulo} 
 				director={pelicula.director} 
-				miniatura={pelicula.miniatura} />)}
+				miniatura={pelicula.miniatura} />})}
 		<div className="actions">
 						<Link to="/add"><button className="new">Añadir</button></Link>
             <button className="down" onClick={props.download}>Descargar</button>

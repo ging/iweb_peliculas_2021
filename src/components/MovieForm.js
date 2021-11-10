@@ -5,7 +5,7 @@ import { useState } from "react";
 export default function MovieForm(props) {
 	const params = useParams();
 
-	let defaultstate = props.new ? {titulo: "", director: "", miniatura: ""}:{...props.themovies.find(({id})=>{ return id===Number(params.movieId)})};
+	let defaultstate = props.new ? {titulo: "", director: "", miniatura: ""}:{...props.themovies[params.movieId]};
 	const [movie, setMovie] = useState(defaultstate);
 	
 		return <div id="main">
@@ -27,7 +27,7 @@ export default function MovieForm(props) {
 						<button className="new" onClick={()=>props.create(movie)}>
 						Crear
 					</button> :
-					<button className="update" onClick={()=>props.update(movie)}>
+					<button className="update" onClick={()=>props.update(params.movieId, movie)}>
 						Actualizar
 					</button>}
 					<Link to="/"><button className="index">Volver</button></Link>
