@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import Movies from "./Movies";
 import MovieInfo from "./MovieInfo";
@@ -6,8 +6,8 @@ import MovieForm from "./MovieForm";
 import { myInitialMovies } from "../constants/constants";
 import {postAPI, getAPI, updateAPI} from "../api";
 
-import { Switch, Route} from "react-router-dom";
-import { withRouter } from "react-router";
+import { Routes, Route} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 
 import es from '../lang/es.json';
 import en from '../lang/en.json';
@@ -16,98 +16,88 @@ const dictionaryList = { en, es };
 
 export const LangContext = React.createContext({userLang: 'es', dictionary: es});
 
-class App extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			loading: true,
-			mymovies: [],
-			nextid: 3,
-			downloaded: null,
-			uploaded: null,
-			lang: 'en'
-		};
+export default function App() {
+	const [loading, setLoading] = useState(true);
+	const [mymovies, setMymovies] = useState([]);
+	const [nextid, setNextid] = useState(3);
+	const [downloaded, setDownloaded] = useState(null);
+	const [uploaded, setUploaded] = useState(null);
+	const [lang, setLang] = useState('en');
+	const navigate = useNavigate();
+
+	const handleLanguageChange = (event) => {
+		setLang(event.target.value);
 	}
 
+	const update = (updatedmovie) => {
+		setMymovies(mymovies.map((movie, index) => updatedmovie.id === movie.id ? updatedmovie : movie));
+		navigate('/');
+	}	
 
-	render(){
-		const {mymovies, downloaded, uploaded} = this.state;
-		
+	const erase = (idtoerase) => {
+		setMymovies(mymovies.filter((movie) => movie.id !== idtoerase));
+		navigate('/');
+	}	
+
+	const create = (movie)  => {
+		movie.id = nextid;
+		setMymovies([...mymovies, movie]);
+		setNextid(nextid + 1);
+		navigate('/');
+	}
+
+	const download = async () => {
+		let downloadedMovies = await getAPI();
+		setMymovies(downloadedMovies);
+		setDownloaded(new Date());
+	}
+
+	const upload = async () => {
+		await updateAPI(mymovies);
+		setUploaded( new Date());
+	}
+
+	const reset = () => {
+		setMymovies(myInitialMovies);
+		setDownloaded(null);
+		setUploaded(null);
+		navigate('/');
+	}
+
+	useEffect(() => {
+    async function fetchData() {
+      try {
+				if (!localStorage.URL || localStorage.URL === "undefined") {
+					localStorage.URL = await postAPI(myInitialMovies);
+					setMymovies(myInitialMovies);
+				} else {
+					await download();
+				}
+				setTimeout(()=>{
+					setLoading(false);
+				},500);	
+				
+			} catch(e) {
+				alert("ERROR");
+			}
+    }
+
+    fetchData();
+  }, []);
+	
 	  	return (
 					<div className="root">
-						<LangContext.Provider value={{handleLanguageChange: this.handleLanguageChange, userLang: this.state.lang, dictionary: dictionaryList[this.state.lang]}}>
+						<LangContext.Provider value={{handleLanguageChange: handleLanguageChange, userLang: lang, dictionary: dictionaryList[lang]}}>
 							<Navbar/>
-							{this.state.loading ? <img src={process.env.PUBLIC_URL + "/spinner.gif"} className="spinner" alt="spinner" />: <Switch>
-									<Route path="/add">
-										<MovieForm themovie={{}} create={this.create} new/>
-									</Route>
-									<Route path="/edit/:movieId">
-										<MovieForm themovies={mymovies} update={this.update}/>
-									</Route>
-									<Route path="/show/:movieId">
-										<MovieInfo themovies={mymovies} />
-									</Route>
-									<Route path="/">
-									<Movies themovies={mymovies} delete={this.erase} download={this.download} upload={this.upload} reset={this.reset} downloaded={downloaded} uploaded={uploaded}/>
-									</Route>
-								</Switch>}
+							{loading ? <img src={process.env.PUBLIC_URL + "/spinner.gif"} className="spinner" alt="spinner" />: <Routes>
+									<Route path="/add" element={<MovieForm themovie={{}} create={create} new/>}/>
+									<Route path="/edit/:movieId"element={<MovieForm themovies={mymovies} update={update}/>}/>
+									<Route path="/show/:movieId" element={<MovieInfo themovies={mymovies} />}/>
+									<Route path="/"element={<Movies themovies={mymovies} delete={erase} download={download} upload={upload} reset={reset} downloaded={downloaded} uploaded={uploaded}/>}/>
+								</Routes>}
 							</LangContext.Provider>
 					</div>
 	  );
 	}
 
-	handleLanguageChange = (event) => {
-		this.setState({lang: event.target.value});
-	}
 
-	update = (updatedmovie) => {
-		this.setState({mymovies: this.state.mymovies.map((movie, index) => updatedmovie.id === movie.id ? updatedmovie : movie)});
-		this.props.history.push('/');
-	}
-
-	erase = (idtoerase) => {
-		this.setState({mymovies: this.state.mymovies.filter((movie) => movie.id !== idtoerase)});
-		this.props.history.push('/');
-	}	
-
-	create = (movie)  => {
-		movie.id = this.state.nextid;
-		this.setState({mymovies: [...this.state.mymovies, movie], nextid: this.state.nextid + 1});
-		this.props.history.push('/');
-	}
-
-	download = async () => {
-		let downloadedMovies = await getAPI();
-		this.setState({mymovies: downloadedMovies, downloaded: new Date()});
-	}
-
-	upload = async () => {
-		await updateAPI(this.state.mymovies);
-		this.setState({uploaded: new Date()});
-	}
-
-	reset = () => {
-		this.setState({mymovies: myInitialMovies, downloaded: null, uploaded: null});
-		this.props.history.push('/');
-	}
-
-	async componentDidMount(){
-		try {
-			if (!localStorage.URL || localStorage.URL === "undefined") {
-			  localStorage.URL = await postAPI(myInitialMovies);
-				this.setState({mymovies: myInitialMovies});
-			} else {
-				await this.download();
-			}
-			setTimeout(()=>{
-				this.setState({loading: false});
-			},500);	
-			
-		} catch(e) {
-			alert("ERROR");
-		}
-	}
-
-}
-
-export default withRouter(App);
